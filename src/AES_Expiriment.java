@@ -1,7 +1,7 @@
 
 import java.util.*;
 
-public class AES_Expirement {
+public class AES_Expiriment {
 
 	//	Fields
 	public static UUID key;
@@ -22,6 +22,7 @@ public class AES_Expirement {
 		System.out.println("\nAES test Key: "+keyString);
 		System.out.print("\nPlease enter your message: ");
 		message = in.nextLine();
+		in.close();
 		encode();
 		decode();
 		check();
@@ -32,20 +33,45 @@ public class AES_Expirement {
 		
 	}
 	
-	public static void addRoundKey(){
+	public static void addRoundKey(int i){
 		
 	}
 	
-	public static void subBytes(){
+	public static void subBytes(int i){
 		
 	}
 	
-	public static void shiftRows(){
+	public static void shiftRows(int j){
+		byte [] tempIn = blocks.get(j);
+		byte [] tempOut = new byte[16];
+		for (int i=0; i<16; i++){
+			if(i%4==0)
+				tempOut[i] = tempIn[i];
+			if(i%4==1)
+				tempOut[i] = tempIn[(i+4)%16];
+			if(i%4==2)
+				tempOut[i] = tempIn[(i+8)%16];
+			if(i%4==3)
+				tempOut[i] = tempIn[(i+12)%16];
+		}
+		blocks.add(j, tempOut);
+	}
+	
+	public static void mixColumns(int i){
 		
 	}
 	
-	public static void mixColumns(){
-		
+	public static void round(int i, boolean fin){
+		if(fin){
+			subBytes(i);
+			shiftRows(i);
+			addRoundKey(i);
+		} else {
+			subBytes(i);
+			shiftRows(i);
+			mixColumns(i);
+			addRoundKey(i);
+		}
 	}
 	
 	//	Exec:	Breaks string into a Byte array,
@@ -58,14 +84,14 @@ public class AES_Expirement {
 		else
 			messageBytes = encoded.getBytes();
 		blocks = new ArrayList<byte[]>();
-		byte[] temp = new byte[16]();
+		byte[] temp = new byte[16];
 		for (int i=0; i<messageBytes.length; i++){
 			temp[i%16] = messageBytes[i];
-			if(i%16 = 15){
+			if(i%16 == 15){
 				blocks.add(temp);
-				if(i = messageBytes-1)
+				if(i == messageBytes.length-1)
 					return;
-				temp = new byte[16]();
+				temp = new byte[16];
 			}
 			blocks.add(temp);
 		}
@@ -74,9 +100,14 @@ public class AES_Expirement {
 	//	Exec: Encodes message using AES encryption
 	//	Post: Saves result to "encoded" field
 	public static void encode() {
-		getBlocks(True);
+		getBlocks(true);
 		expandKey();
-		addRoundKey();
+		for (int i=0; i<blocks.size(); i++){
+			addRoundKey(i);
+			for (int j=0; j<10; i++)
+				round(i, true);
+			round(i, false);
+		}
 		
 	}
 	
@@ -93,6 +124,6 @@ public class AES_Expirement {
 	//	Exec: Decrypts encrypted message with AES
 	//	Post: Saves result to "decoded" field
 	public static void decode() {
-		getBlocks(False);
+		getBlocks(false);
 	}
 }
