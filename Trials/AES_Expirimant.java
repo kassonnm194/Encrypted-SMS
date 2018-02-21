@@ -8,7 +8,8 @@ public class AES_Expirement {
 	public static String keyString;
 	public static Scanner in;
 	public static String message;
-	public static ArrayList blocks;
+	public static byte[] messageBytes;
+	public static ArrayList<byte[]> blocks;
 	public static String encoded;
 	public static String decoded;
 	
@@ -20,6 +21,7 @@ public class AES_Expirement {
 		System.out.println("\nAES test Key: "+keyString);
 		System.out.print("\nPlease enter your message: ");
 		message = in.nextLine();
+		messageBytes = message.getBytes();
 		getBlocks();
 		encode();
 		decode();
@@ -29,8 +31,18 @@ public class AES_Expirement {
 	//	Exec: Breaks "message" string into 16 bit strings
 	//	Post: Saves 16 bit strings to "mList" field
 	public static void getBlocks() {
-		blocks = new ArrayList();
-		
+		blocks = new ArrayList<byte[]>();
+		byte[] temp = new byte[16]();
+		for (int i=0; i<messageBytes.length; i++){
+			temp[i%16] = messageBytes[i];
+			if(i%16 = 15){
+				blocks.add(temp);
+				if(i = messageBytes-1)
+					return;
+				temp = new byte[16]();
+			}
+			blocks.add(temp);
+		}
 	}
 	
 	//	Exec: Encodes message using AES encryption
